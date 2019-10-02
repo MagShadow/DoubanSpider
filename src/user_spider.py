@@ -8,6 +8,7 @@ import numpy as np
 from bs4 import BeautifulSoup
 from bs_filters import *
 from utilities import *
+from user_book_spider import *
 
 
 def login(filename):
@@ -28,33 +29,24 @@ def login(filename):
     return s
 
 
-def dig_user(user_id, s, is_self=False, recursive=False):
-    homepage_url = f"https://www.douban.com/people/{user_id}/"
-    # print(homepage_url)
-
-    time.sleep(np.random.rand())
-    r = s.get(homepage_url, headers=headers_ua[0])
-    soup = BeautifulSoup(r.text, "lxml")
-    # with open("./test/user_login.html", "w") as f:
-    #     f.write(soup.prettify())
-
-    # 抓取个人基本信息
+def get_user_info(user_id, soup):
     user_info = {"id": "", "name": "", "intro": "", "loc": "", "sig": ""}
     try:
         user_info["id"] = user_id
-        print("Id get!")
+        # print("Id get!")
 
         user_info["name"] = soup.title.string.strip()
-        print("Name get!")
+        # print("Name get!")
 
         intro = soup.find('textarea', {'name': 'intro'})
         user_info["intro"] = intro.string
-        print("Intro get!")
+        # print("Intro get!")
+    except Exception as e:
+        print(str(e))
 
+    try:
         loc = soup.find('div', {'class': 'user-info'}).a
         user_info["loc"] = loc.string.strip()
-        print("Loc get!")
-
     except Exception as e:
         print(str(e))
 
@@ -66,11 +58,33 @@ def dig_user(user_id, s, is_self=False, recursive=False):
             user_info["sig"] = sig.string.strip()
     except Exception as e:
         print("Signature Loss!", str(e))
-    print(user_info)
 
-    # Collect Contact/Rev_Contact Info
+    return user_info
+
+
+def dig_user(user_id, s, is_self=False, recursive=False):
+    homepage_url = f"https://www.douban.com/people/{user_id}/"
+    # print(homepage_url)
+
+    time.sleep(np.random.rand())
+    r = s.get(homepage_url, headers=headers_ua[0])
+    soup = BeautifulSoup(r.text, "lxml")
+    # with open("./test/user_login.html", "w") as f:
+    #     f.write(soup.prettify())
+
+    # 抓取个人基本信息
+    user_info = get_user_info(user_id, soup)
+
+    # 如果title抓出来是豆瓣，说明该用户已经注销
+    if user_info["name"] == "豆瓣":
+        return False
+
+    # 抓取图书列表
+    dig_user_book(user_id, s)
+
     if recursive == False:
         return
+    # Collect Contact/Rev_Contact Info
 
     if is_self:
         contact_url = "https://www.douban.com/contacts/list"
@@ -79,6 +93,7 @@ def dig_user(user_id, s, is_self=False, recursive=False):
         time.sleep(np.random.rand())
         r = s.get(contact_url, headers=headers_ua[0])
         soup_contact = BeautifulSoup(r.text, "lxml")
+        index = 0
         # with open("./test/self_contact.html", "w") as f:
         #     f.write(soup_contact.prettify())
         while True:
@@ -87,9 +102,17 @@ def dig_user(user_id, s, is_self=False, recursive=False):
             for u in user_list:
                 print("User:", u.div.h3.a.string)
                 user_url = u.a["href"]
-                tar_user_id = link_to_id(user_url)
+                tar_user_id = url_to_id(user_url)
                 dig_user(tar_user_id, s)
-            break
+            # print(len(user_list), index)
+            if len(user_list) < 20:
+                break
+            else:
+                index += 20
+                time.sleep(np.random.rand())
+                r = s.get(contact_url+"?tag=0&start=" +
+                          str(index), headers=headers_ua[0])
+                soup_contact = BeautifulSoup(r.text, "lxml")
 
     else:
         contact_url = homepage_url+"contacts"
@@ -100,7 +123,8 @@ if __name__ == "__main__":
     with open("./src/yang.json", "r") as f:
         user_json = json.load(f)
 
-    # dig_user(user_id=user_json["user"], s=login(
-    #     "./src/yang.json"), is_self=True, recursive=True)
-    dig_user(user_id="201927921", s=login(
-        "./src/yang.json"), is_self=False, recursive=False)
+    dig_user(user_id=user_json["user"], s=login(
+      "./src/yang.json"), is_self=True, recursive=False)
+    # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
+    # dig_user(user_id="201927921", s=login(
+    #     "./src/yang.json"), is_self=False, recursive=False)
