@@ -2,7 +2,9 @@
 
 
 def is_signature(ele):
-    return ele.name == "div" and ele.has_attr('class') and ('signature_display' in ele['class'])
+    if ele.name != "div" or not ele.has_attr('class'):
+        return False
+    return ('signature_display' in ele['class']) or ('a_edit_signature' in ele['class'])
     # if ele.name == "div" and ele.has_attr('class'):
     #     print(ele['class'])
     #     return True
