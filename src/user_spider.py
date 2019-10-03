@@ -8,7 +8,8 @@ import numpy as np
 from bs4 import BeautifulSoup
 from bs_filters import *
 from utilities import *
-from user_book_spider import *
+from book_spider import *
+from movie_spider import *
 
 
 def login(filename):
@@ -80,7 +81,11 @@ def dig_user(user_id, s, is_self=False, recursive=False):
         return False
 
     # 抓取图书列表
-    dig_user_book(user_id, s)
+    # dig_user_book(user_id, s)
+
+    # 抓取影视列表
+    dig_user_movie(user_id, s)
+
 
     if recursive == False:
         return

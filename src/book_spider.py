@@ -1,12 +1,10 @@
-import time
-import numpy as np
 from bs4 import BeautifulSoup
 from utilities import *
 
 
 def get_book_info(book_id, s):
     book_url = f"https://book.douban.com/subject/{book_id}/"
-    time.sleep(np.random.rand())
+    pause()
     r = s.get(book_url, headers=headers_ua[0])
     soup_book = BeautifulSoup(r.text, "lxml")
 
@@ -34,7 +32,7 @@ def get_book_list(url, s):
     index = 0
     full_list = []
     while True:
-        time.sleep(np.random.rand())
+        pause()
         r = s.get(temp_url, headers=headers_ua[0])
         soup_book = BeautifulSoup(r.text, "lxml")
 
