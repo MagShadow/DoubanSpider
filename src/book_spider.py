@@ -43,9 +43,14 @@ def get_book_list(url, s):
             book_url = link["href"]
             # print(book_url)
             tar_book_id = url_to_id(book_url, cat="book")
-            print(get_book_info(tar_book_id, s))
-
-        full_list += book_list
+            try:
+                sp = b.find("div", {"class": "short-note"}).div.span
+                # print(sp)
+                rating = get_rating(sp)
+            except:
+                rating = 0
+            full_list.append((tar_book_id, rating))
+            # print(get_book_info(tar_book_id, s))
 
         if len(book_list) < 15:
             break
@@ -53,6 +58,9 @@ def get_book_list(url, s):
             index += 15
             temp_url = url + \
                 f"?start={str(index)}&sort=time&rating=all&filter=all&mode=grid"
+            # print(temp_url)
+
+    return full_list
 
 
 def dig_user_book(user_id, s, is_self=False):
@@ -60,6 +68,9 @@ def dig_user_book(user_id, s, is_self=False):
     wish_url = f"https://book.douban.com/people/{user_id}/wish"
     collect_url = f"https://book.douban.com/people/{user_id}/collect"
 
-    # get_book_list(do_url, s)
-    get_book_list(wish_url, s)
-    # get_book_list(collect_url, s)
+    # do_list = get_book_list(do_url, s)
+    # wish_list = get_book_list(wish_url, s)
+    collect_list = get_book_list(collect_url, s)
+    print(len(collect_list))
+    for item in collect_list:
+        print(item[0], "Rating:", item[1])

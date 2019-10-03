@@ -43,9 +43,18 @@ def get_movie_list(url, s):
             movie_url = link["href"]
             # print(movie_url)
             tar_movie_id = url_to_id(movie_url, cat="movie")
-            print(get_movie_info(tar_movie_id, s))
+            # print(get_movie_info(tar_movie_id, s))
 
-        full_list += movie_list
+            tar_movie_id = url_to_id(movie_url, cat="movie")
+            try:
+                sp = b.find("ul").li.next_sibling.next_sibling.span
+                # print(sp)
+                rating = get_rating(sp)
+            except:
+                rating = 0
+            full_list.append((tar_movie_id, rating))
+
+        # full_list += movie_list
 
         if len(movie_list) < 15:
             break
@@ -53,6 +62,7 @@ def get_movie_list(url, s):
             index += 15
             temp_url = url + \
                 f"?start={str(index)}&sort=time&rating=all&filter=all&mode=grid"
+    return full_list
 
 
 def dig_user_movie(user_id, s, is_self=False):
@@ -60,6 +70,10 @@ def dig_user_movie(user_id, s, is_self=False):
     wish_url = f"https://movie.douban.com/people/{user_id}/wish"
     collect_url = f"https://movie.douban.com/people/{user_id}/collect"
 
-    get_movie_list(do_url, s)
+    # do_list = get_movie_list(do_url, s)
     # get_movie_list(wish_url, s)
-    # get_movie_list(collect_url, s)
+    collect_list = get_movie_list(collect_url, s)
+
+    print(len(collect_list))
+    for item in collect_list:
+        print(item[0], "Rating:", item[1])
