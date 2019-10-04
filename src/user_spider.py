@@ -12,6 +12,7 @@ from book_spider import dig_user_book
 from movie_spider import dig_user_movie
 from music_spider import dig_user_music
 from game_spider import dig_user_game
+from drama_spider import dig_user_drama
 
 
 def login(filename):
@@ -77,7 +78,7 @@ def dig_user(user_id, s, is_self=False, recursive=False):
 
     # 抓取个人基本信息
     user_info = get_user_info(user_id, soup)
-
+    print(user_info)
     # 如果title抓出来是豆瓣，说明该用户已经注销
     if user_info["name"] == "豆瓣":
         return False
@@ -90,9 +91,12 @@ def dig_user(user_id, s, is_self=False, recursive=False):
 
     # 抓取音乐列表
     # dig_user_music(user_id, s)
-    
-    # 抓取音乐列表
-    dig_user_game(user_id, s)
+
+    # 抓取游戏列表
+    # dig_user_game(user_id, s)
+
+    # 抓取舞台剧列表
+    dig_user_drama(user_id, s)
 
     if recursive == False:
         return
@@ -135,8 +139,8 @@ if __name__ == "__main__":
     with open("./src/yang.json", "r") as f:
         user_json = json.load(f)
 
-    dig_user(user_id=user_json["user"], s=login(
-        "./src/yang.json"), is_self=True, recursive=False)
+    # dig_user(user_id=user_json["user"], s=login(
+    #     "./src/yang.json"), is_self=True, recursive=False)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
-    # dig_user(user_id="201927921", s=login(
-    #     "./src/yang.json"), is_self=False, recursive=False)
+    dig_user(user_id="175563657", s=login(
+        "./src/yang.json"), is_self=False, recursive=False)

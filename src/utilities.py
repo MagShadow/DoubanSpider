@@ -37,6 +37,13 @@ def url_to_id(url, cat="people"):
         else:
             return url[l+6:]
 
+    if cat == "drama":
+        l = url.find("/drama/")
+        if url[-1:] == '/':
+            return url[l+7:-1]
+        else:
+            return url[l+7:]
+
 
 def get_rating(span):
     if not span.has_attr("class"):
