@@ -8,9 +8,10 @@ import numpy as np
 from bs4 import BeautifulSoup
 from bs_filters import *
 from utilities import *
-from book_spider import *
-from movie_spider import *
-from music_spider import *
+from book_spider import dig_user_book
+from movie_spider import dig_user_movie
+from music_spider import dig_user_music
+from game_spider import dig_user_game
 
 
 def login(filename):
@@ -88,7 +89,10 @@ def dig_user(user_id, s, is_self=False, recursive=False):
     # dig_user_movie(user_id, s)
 
     # 抓取音乐列表
-    dig_user_music(user_id, s)
+    # dig_user_music(user_id, s)
+    
+    # 抓取音乐列表
+    dig_user_game(user_id, s)
 
     if recursive == False:
         return

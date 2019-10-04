@@ -46,7 +46,6 @@ def get_music_list(url, s):
             tar_music_id = url_to_id(music_url, cat="music")
             # print(get_music_info(tar_music_id, s))
 
-            tar_music_id = url_to_id(music_url, cat="music")
             try:
                 ul = b.find("ul")
                 sp = ul.li.next_sibling.next_sibling.next_sibling.next_sibling.span

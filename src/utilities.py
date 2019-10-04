@@ -30,19 +30,30 @@ def url_to_id(url, cat="people"):
         else:
             return url[l+9:]
 
+    if cat == "game":
+        l = url.find("/game/")
+        if url[-1:] == '/':
+            return url[l+6:-1]
+        else:
+            return url[l+6:]
+
 
 def get_rating(span):
     if not span.has_attr("class"):
         return 0
     st = span["class"][0]
     # print(st)
-    if len(st) < 6:
+    if len(st) < 6 or not "rating" in st:
         return 0
-    return int(st[6])*2
+    # print(st)
+    if "star" in st:
+        return int(span["class"][1][7])*2
+    else:
+        return int(st[6])*2
 
 
 if __name__ == "__main__":
     # print(url_to_id("https://www.douban.com/people/ikgendou/"))
     # print(url_to_id("https://www.douban.com/people/2783455"))
-    soup = BeautifulSoup('<span class="rating5-t"></span>', "lxml")
+    soup = BeautifulSoup('<span class="rating-star allstar40"></span>', "lxml")
     print(get_rating(soup.span))

@@ -45,7 +45,6 @@ def get_movie_list(url, s):
             tar_movie_id = url_to_id(movie_url, cat="movie")
             # print(get_movie_info(tar_movie_id, s))
 
-            tar_movie_id = url_to_id(movie_url, cat="movie")
             try:
                 ul = b.find("ul")
                 sp = ul.li.next_sibling.next_sibling.next_sibling.next_sibling.span
