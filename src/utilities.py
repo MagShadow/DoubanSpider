@@ -23,7 +23,7 @@ def url_to_id(url, cat="people"):
         else:
             return url[l+8:]
 
-    if cat == "book" or cat == "movie":
+    if cat == "book" or cat == "movie" or cat == "music":
         l = url.find("/subject/")
         if url[-1:] == '/':
             return url[l+9:-1]

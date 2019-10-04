@@ -10,6 +10,7 @@ from bs_filters import *
 from utilities import *
 from book_spider import *
 from movie_spider import *
+from music_spider import *
 
 
 def login(filename):
@@ -84,8 +85,10 @@ def dig_user(user_id, s, is_self=False, recursive=False):
     # dig_user_book(user_id, s)
 
     # 抓取影视列表
-    dig_user_movie(user_id, s)
+    # dig_user_movie(user_id, s)
 
+    # 抓取音乐列表
+    dig_user_music(user_id, s)
 
     if recursive == False:
         return
@@ -129,7 +132,7 @@ if __name__ == "__main__":
         user_json = json.load(f)
 
     dig_user(user_id=user_json["user"], s=login(
-      "./src/yang.json"), is_self=True, recursive=False)
+        "./src/yang.json"), is_self=True, recursive=False)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
     # dig_user(user_id="201927921", s=login(
     #     "./src/yang.json"), is_self=False, recursive=False)
