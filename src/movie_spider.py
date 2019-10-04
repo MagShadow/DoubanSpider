@@ -47,8 +47,10 @@ def get_movie_list(url, s):
 
             tar_movie_id = url_to_id(movie_url, cat="movie")
             try:
-                sp = b.find("ul").li.next_sibling.next_sibling.span
-                # print(sp)
+                ul = b.find("ul")
+                sp = ul.li.next_sibling.next_sibling.next_sibling.next_sibling.span
+                # 同级列表中的<li></li>，连接时第一个next_sibling会指向中间的分隔符
+                # 见https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/next-sibling-previous-sibling
                 rating = get_rating(sp)
             except:
                 rating = 0
