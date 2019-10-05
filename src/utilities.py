@@ -78,7 +78,7 @@ def save(user_id, item_list, cat="contact"):
     filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
 
     if cat == "contact" or cat == "rcontact":
-        header = ["id", "name", "loc", "sig", "intro"]
+        header = ["id", "name", "loc", "sig"]
     else:
         header = ["id", "rating", "status"]
 
@@ -93,4 +93,4 @@ if __name__ == "__main__":
     # print(url_to_id("https://www.douban.com/people/2783455"))
     # soup = BeautifulSoup('<span class="rating-star allstar40"></span>', "lxml")
     # print(get_rating(soup.span))
-    save("ikgendou", [], "contact")
+    print()
