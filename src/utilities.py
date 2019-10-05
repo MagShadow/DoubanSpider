@@ -1,4 +1,6 @@
 import re
+import csv
+import os
 import time
 import numpy as np
 from bs4 import BeautifulSoup
@@ -59,8 +61,33 @@ def get_rating(span):
         return int(st[6])*2
 
 
+def save(user_id, item_list, cat="contact"):
+    '''
+    Filename will be "./data/{user_id}/{user_id}_{cat}.csv";
+    '''
+    cat_set = set("contact", "rcontact", "book",
+                  "movie", "music", "game", "drama")
+    assert cat in cat_set
+
+    data_path = os.path.join("data", user_id)
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+    filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
+
+    if cat == "contact" or cat == "rcontact":
+        header = ["id", "name", "loc", "sig", "intro"]
+    else:
+        header = ["id", "rating", "status"]
+
+    with open(filename, "w") as f:
+        f_csv = csv.DictWriter(f, header)
+        f_csv.writeheader()
+        f_csv.writerows(item_list)
+
+
 if __name__ == "__main__":
     # print(url_to_id("https://www.douban.com/people/ikgendou/"))
     # print(url_to_id("https://www.douban.com/people/2783455"))
-    soup = BeautifulSoup('<span class="rating-star allstar40"></span>', "lxml")
-    print(get_rating(soup.span))
+    # soup = BeautifulSoup('<span class="rating-star allstar40"></span>', "lxml")
+    # print(get_rating(soup.span))
+    save("ikgendou", [], "contact")
