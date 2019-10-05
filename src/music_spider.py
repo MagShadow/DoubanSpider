@@ -27,7 +27,7 @@ def get_music_info(music_id, s):
     return music_info
 
 
-def get_music_list(url, s):
+def get_music_list(url, s, get_detail=False):
     temp_url = url
     index = 0
     full_list = []
@@ -56,6 +56,9 @@ def get_music_list(url, s):
                 rating = 0
             full_list.append((tar_music_id, rating))
 
+            if get_detail:
+                get_music_info(tar_music_id, s)
+
         if len(music_list) < 15:
             break
         else:
@@ -72,9 +75,17 @@ def dig_user_music(user_id, s, is_self=False):
     wish_url = f"https://music.douban.com/people/{user_id}/wish"
     collect_url = f"https://music.douban.com/people/{user_id}/collect"
 
-    # do_list = get_music_list(do_url, s)
-    # wish_list = get_music_list(wish_url, s)
+    do_list = get_music_list(do_url, s)
+    wish_list = get_music_list(wish_url, s)
     collect_list = get_music_list(collect_url, s)
-    print(len(collect_list))
+
+    music_list = []
+    for item in do_list:
+        music_list.append({"id": item[0], "rating": item[1], "status": "do"})
+    for item in wish_list:
+        music_list.append({"id": item[0], "rating": item[1], "status": "wish"})
     for item in collect_list:
-        print(item[0], "Rating:", item[1])
+        music_list.append(
+            {"id": item[0], "rating": item[1], "status": "collect"})
+
+    save(user_id, music_list, "music")

@@ -27,7 +27,7 @@ def get_book_info(book_id, s):
     return book_info
 
 
-def get_book_list(url, s):
+def get_book_list(url, s, get_detail=False):
     temp_url = url
     index = 0
     full_list = []
@@ -50,7 +50,9 @@ def get_book_list(url, s):
             except:
                 rating = 0
             full_list.append((tar_book_id, rating))
-            # print(get_book_info(tar_book_id, s))
+            
+            if get_detail:
+                get_book_info(tar_book_id, s)
 
         if len(book_list) < 15:
             break
@@ -68,9 +70,17 @@ def dig_user_book(user_id, s, is_self=False):
     wish_url = f"https://book.douban.com/people/{user_id}/wish"
     collect_url = f"https://book.douban.com/people/{user_id}/collect"
 
-    # do_list = get_book_list(do_url, s)
-    # wish_list = get_book_list(wish_url, s)
+    do_list = get_book_list(do_url, s)
+    wish_list = get_book_list(wish_url, s)
     collect_list = get_book_list(collect_url, s)
-    print(len(collect_list))
+
+    book_list = []
+    for item in do_list:
+        book_list.append({"id": item[0], "rating": item[1], "status": "do"})
+    for item in wish_list:
+        book_list.append({"id": item[0], "rating": item[1], "status": "wish"})
     for item in collect_list:
-        print(item[0], "Rating:", item[1])
+        book_list.append(
+            {"id": item[0], "rating": item[1], "status": "collect"})
+
+    save(user_id, book_list, "book")

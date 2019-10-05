@@ -27,7 +27,7 @@ def get_movie_info(movie_id, s):
     return movie_info
 
 
-def get_movie_list(url, s):
+def get_movie_list(url, s, get_detail=False):
     temp_url = url
     index = 0
     full_list = []
@@ -43,7 +43,6 @@ def get_movie_list(url, s):
             movie_url = link["href"]
             # print(movie_url)
             tar_movie_id = url_to_id(movie_url, cat="movie")
-            # print(get_movie_info(tar_movie_id, s))
 
             try:
                 ul = b.find("ul")
@@ -54,6 +53,9 @@ def get_movie_list(url, s):
             except:
                 rating = 0
             full_list.append((tar_movie_id, rating))
+
+            if get_detail:
+                get_movie_info(tar_movie_id, s)
 
         # full_list += movie_list
 
@@ -71,10 +73,17 @@ def dig_user_movie(user_id, s, is_self=False):
     wish_url = f"https://movie.douban.com/people/{user_id}/wish"
     collect_url = f"https://movie.douban.com/people/{user_id}/collect"
 
-    # do_list = get_movie_list(do_url, s)
-    # get_movie_list(wish_url, s)
+    do_list = get_movie_list(do_url, s)
+    wish_list = get_movie_list(wish_url, s)
     collect_list = get_movie_list(collect_url, s)
 
-    print(len(collect_list))
+    movie_list = []
+    for item in do_list:
+        movie_list.append({"id": item[0], "rating": item[1], "status": "do"})
+    for item in wish_list:
+        movie_list.append({"id": item[0], "rating": item[1], "status": "wish"})
     for item in collect_list:
-        print(item[0], "Rating:", item[1])
+        movie_list.append(
+            {"id": item[0], "rating": item[1], "status": "collect"})
+
+    save(user_id, movie_list, "movie")

@@ -27,7 +27,7 @@ def get_game_info(game_id, s):
     return game_info
 
 
-def get_game_list(url, s):
+def get_game_list(url, s, get_detail=False):
     temp_url = url
     index = 0
     full_list = []
@@ -44,7 +44,6 @@ def get_game_list(url, s):
             game_url = link["href"]
             # print(game_url)
             tar_game_id = url_to_id(game_url, cat="game")
-            print(get_game_info(tar_game_id, s))
 
             try:
                 d = b.find("div", {"class": "rating-info"})
@@ -52,6 +51,9 @@ def get_game_list(url, s):
             except:
                 rating = 0
             full_list.append((tar_game_id, rating))
+
+            if get_detail:
+                get_game_info(tar_game_id, s)
 
         if len(game_list) < 15:
             break
@@ -68,9 +70,17 @@ def dig_user_game(user_id, s, is_self=False):
     wish_url = f"https://www.douban.com/people/{user_id}/games?action=wish"
     collect_url = f"https://www.douban.com/people/{user_id}/games?action=collect"
 
-    # do_list = get_game_list(do_url, s)
-    # wish_list = get_game_list(wish_url, s)
+    do_list = get_game_list(do_url, s)
+    wish_list = get_game_list(wish_url, s)
     collect_list = get_game_list(collect_url, s)
-    print(len(collect_list))
+
+    game_list = []
+    for item in do_list:
+        game_list.append({"id": item[0], "rating": item[1], "status": "do"})
+    for item in wish_list:
+        game_list.append({"id": item[0], "rating": item[1], "status": "wish"})
     for item in collect_list:
-        print(item[0], "Rating:", item[1])
+        game_list.append(
+            {"id": item[0], "rating": item[1], "status": "collect"})
+
+    save(user_id, game_list, "game")

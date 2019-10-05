@@ -61,12 +61,15 @@ def get_rating(span):
         return int(st[6])*2
 
 
+cat_set = set(["contact", "rcontact", "book",
+               "movie", "music", "game", "drama"])
+
+
 def save(user_id, item_list, cat="contact"):
     '''
     Filename will be "./data/{user_id}/{user_id}_{cat}.csv";
     '''
-    cat_set = set("contact", "rcontact", "book",
-                  "movie", "music", "game", "drama")
+
     assert cat in cat_set
 
     data_path = os.path.join("data", user_id)

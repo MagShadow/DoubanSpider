@@ -30,7 +30,7 @@ def get_drama_info(drama_id, s):
     return drama_info
 
 
-def get_drama_list(url, s):
+def get_drama_list(url, s, get_detail=False):
     temp_url = url
     index = 0
     full_list = []
@@ -53,7 +53,9 @@ def get_drama_list(url, s):
             except:
                 rating = 0
             full_list.append((tar_drama_id, rating))
-            print(get_drama_info(tar_drama_id, s))
+
+            if get_detail:
+                get_drama_info(tar_drama_id, s)
 
         if len(drama_list) < 15:
             break
@@ -71,11 +73,13 @@ def dig_user_drama(user_id, s, is_self=False):
     collect_url = f"https://www.douban.com/location/people/{user_id}/drama/collect"
 
     wish_list = get_drama_list(wish_url, s)
-    print(len(wish_list))
-    for item in wish_list:
-        print(item[0], "Rating:", item[1])
+    collect_list = get_drama_list(collect_url, s)
+    drama_list = []
 
-    # collect_list = get_drama_list(collect_url, s)
-    # print(len(collect_list))
-    # for item in collect_list:
-    #     print(item[0], "Rating:", item[1])
+    for item in wish_list:
+        drama_list.append({"id": item[0], "rating": item[1], "status": "wish"})
+    for item in collect_list:
+        drama_list.append(
+            {"id": item[0], "rating": item[1], "status": "collect"})
+
+    save(user_id, drama_list, "drama")
