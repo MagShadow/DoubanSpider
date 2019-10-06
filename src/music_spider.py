@@ -4,9 +4,7 @@ from utilities import *
 
 def get_music_info(music_id, s):
     music_url = f"https://music.douban.com/subject/{music_id}/"
-    pause()
-    r = s.get(music_url, headers=headers_ua[0])
-    soup_music = BeautifulSoup(r.text, "lxml")
+    soup_music = get_response(s, music_url)
 
     music_info = {"id": "", "name": "", "rating": 0}
     music_info["id"] = music_id
@@ -32,9 +30,7 @@ def get_music_list(url, s, get_detail=False):
     index = 0
     full_list = []
     while True:
-        pause()
-        r = s.get(temp_url, headers=headers_ua[0])
-        soup_music = BeautifulSoup(r.text, "lxml")
+        soup_music = get_response(s, temp_url)
 
         music_list = soup_music.find_all("div", {"class": "item"})
 

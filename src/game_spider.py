@@ -4,9 +4,7 @@ from utilities import *
 
 def get_game_info(game_id, s):
     game_url = f"https://www.douban.com/game/{game_id}/"
-    pause()
-    r = s.get(game_url, headers=headers_ua[0])
-    soup_game = BeautifulSoup(r.text, "lxml")
+    soup_game = get_response(s, game_url)
 
     game_info = {"id": "", "name": "", "rating": 0}
     game_info["id"] = game_id
@@ -32,9 +30,7 @@ def get_game_list(url, s, get_detail=False):
     index = 0
     full_list = []
     while True:
-        pause()
-        r = s.get(temp_url, headers=headers_ua[0])
-        soup_game = BeautifulSoup(r.text, "lxml")
+        soup_game = get_response(s, temp_url)
 
         game_list = soup_game.find_all("div", {"class": "common-item"})
 

@@ -4,9 +4,7 @@ from utilities import *
 
 def get_drama_info(drama_id, s):
     drama_url = f"https://www.douban.com/location/drama/{drama_id}/"
-    pause()
-    r = s.get(drama_url, headers=headers_ua[0])
-    soup_drama = BeautifulSoup(r.text, "lxml")
+    soup_drama = get_response(s, drama_url)
 
     drama_info = {"id": "", "name": "", "rating": 0}
     drama_info["id"] = drama_id
@@ -35,9 +33,7 @@ def get_drama_list(url, s, get_detail=False):
     index = 0
     full_list = []
     while True:
-        pause()
-        r = s.get(temp_url, headers=headers_ua[0])
-        soup_drama = BeautifulSoup(r.text, "lxml")
+        soup_drama = get_response(s, temp_url)
 
         drama_list = soup_drama.find_all("div", {"class": "item"})
         for b in drama_list:

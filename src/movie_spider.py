@@ -4,9 +4,7 @@ from utilities import *
 
 def get_movie_info(movie_id, s):
     movie_url = f"https://movie.douban.com/subject/{movie_id}/"
-    pause()
-    r = s.get(movie_url, headers=headers_ua[0])
-    soup_movie = BeautifulSoup(r.text, "lxml")
+    soup_movie = get_response(s, movie_url)
 
     movie_info = {"id": "", "name": "", "rating": 0}
     movie_info["id"] = movie_id
@@ -32,9 +30,7 @@ def get_movie_list(url, s, get_detail=False):
     index = 0
     full_list = []
     while True:
-        pause()
-        r = s.get(temp_url, headers=headers_ua[0])
-        soup_movie = BeautifulSoup(r.text, "lxml")
+        soup_movie = get_response(s, temp_url)
 
         movie_list = soup_movie.find_all("div", {"class": "item"})
         for b in movie_list:

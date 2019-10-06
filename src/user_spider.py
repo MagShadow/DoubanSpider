@@ -31,12 +31,28 @@ def login(filename):
     s.post(login_url, headers=headers_ua[0], data=data)
     # print(html)
     return s
-
+    
+def login_2(filename):
+    login_url = "https://accounts.douban.com/j/mobile/login/basic"
+    with open(filename, "r") as f:
+        user_json = json.load(f)
+    name, pswd = user_json["email"], user_json["pswd"]
+    data = {
+        'ck': '',
+        "name": name,
+        "password": pswd,
+        'remember': 'true',
+        'ticket': '',
+    }
+    s = requests.Session()
+    s.post(login_url, headers=headers_ua[0], data=data)
+    # print(html)
+    return s
 
 def get_user_info(user_id, s):
     url = f"https://www.douban.com/people/{user_id}/"
-    r = s.get(url, headers=headers_ua[0])
-    soup = BeautifulSoup(r.text, "lxml")
+
+    soup = get_response(s, url)
     user_info = {"id": "", "name": "", "loc": "", "sig": "", "intro": ""}
     try:
         user_info["id"] = user_id
@@ -74,9 +90,7 @@ def get_self_contact_list(url, s):
     #     f.write(soup_contact.prettify())
     full_list = []
     while True:
-        pause()
-        r = s.get(temp_url, headers=headers_ua[0])
-        soup_contact = BeautifulSoup(r.text, "lxml")
+        soup_contact = get_response(s, temp_url)
 
         user_list = soup_contact.find(
             "ul", {"class": "user-list"}).find_all("li", {"class": "clearfix"})
@@ -107,9 +121,7 @@ def get_other_contact_list(url, s):
     index = 0
     full_list = []
 
-    pause()
-    r = s.get(temp_url, headers=headers_ua[0])
-    soup_contact = BeautifulSoup(r.text, "lxml")
+    soup_contact = get_response(s, temp_url)
     if (soup_contact.find("div", {"id": "db-timeline-hd"})) != None or (soup_contact.find("ul", {"class": "user-list"}) != None):
         if url[-12:] == "rev_contacts":
             return get_self_contact_list("https://www.douban.com/contacts/rlist", s)
@@ -154,9 +166,7 @@ def get_other_contact_list(url, s):
                 index += 70
                 temp_url = url+"?start=" + str(index)
 
-            pause()
-            r = s.get(temp_url, headers=headers_ua[0])
-            soup_contact = BeautifulSoup(r.text, "lxml")
+            soup_contact = get_response(s, temp_url)
 
     return full_list
 
@@ -165,6 +175,7 @@ def dig_user_contact(user_id, s, cat="contact"):
     assert cat in ["contact", "rcontact"]
 
     if data_exist(user_id, cat=cat):
+        print(f"Use existed {cat} data!")
         return read(user_id, cat=cat)
 
     homepage_url = f"https://www.douban.com/people/{user_id}/"
@@ -230,8 +241,9 @@ def dig_user(user_id, s, recursive=False):
         if recursive:
             for friend_id in friend_id_list:
                 dig_user(friend_id, s)
-    except:
+    except Exception as e:
         print(f"Error when collect {user_id}!")
+        print(str(e))
 
 
 if __name__ == "__main__":
@@ -239,7 +251,7 @@ if __name__ == "__main__":
         user_json = json.load(f)
 
     dig_user(user_id=user_json["user"], s=login(
-        "./src/login.json"), recursive=False)
+        "./src/login.json"), recursive=True)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
     # dig_user(user_id="175563657", s=login(
     #     "./src/yang.json"), is_self=False, recursive=False)

@@ -4,9 +4,7 @@ from utilities import *
 
 def get_book_info(book_id, s):
     book_url = f"https://book.douban.com/subject/{book_id}/"
-    pause()
-    r = s.get(book_url, headers=headers_ua[0])
-    soup_book = BeautifulSoup(r.text, "lxml")
+    soup_book = get_response(s, book_url)
 
     book_info = {"id": "", "name": "", "rating": 0}
     book_info["id"] = book_id
@@ -32,9 +30,8 @@ def get_book_list(url, s, get_detail=False):
     index = 0
     full_list = []
     while True:
-        pause()
-        r = s.get(temp_url, headers=headers_ua[0])
-        soup_book = BeautifulSoup(r.text, "lxml")
+
+        soup_book = get_response(s, temp_url)
 
         book_list = soup_book.find_all("li", {"class": "subject-item"})
         for b in book_list:

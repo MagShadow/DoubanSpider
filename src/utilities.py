@@ -3,6 +3,7 @@ import csv
 import os
 import time
 import numpy as np
+
 from bs4 import BeautifulSoup
 
 headers_ua = [
@@ -10,7 +11,25 @@ headers_ua = [
 headers_l = len(headers_ua)
 
 
-def pause(t=0.5):
+def get_response(s, url):
+    pause()
+    r = s.get(url, headers=headers_ua[0])
+    soup = BeautifulSoup(r.text, "lxml")
+
+    while soup.head.title.string.strip() == "禁止访问":
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("!         Captcha          !")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print()
+        print("Please use Browser to visit douban.com")
+        x = input("Press any key after finished:")
+        r = s.get(url, headers=headers_ua[0])
+        soup = BeautifulSoup(r.text, "lxml")
+
+    return soup
+
+
+def pause(t=1):
     time.sleep(np.random.rand()*t)
 
 
