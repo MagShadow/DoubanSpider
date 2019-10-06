@@ -110,8 +110,11 @@ def get_other_contact_list(url, s):
     pause()
     r = s.get(temp_url, headers=headers_ua[0])
     soup_contact = BeautifulSoup(r.text, "lxml")
-    if soup_contact.find("div", {"id": "db-timeline-hd"}) != None:
-        return get_self_contact_list(url, s)
+    if (soup_contact.find("div", {"id": "db-timeline-hd"})) != None or (soup_contact.find("ul", {"class": "user-list"}) != None):
+        if url[-12:] == "rev_contacts":
+            return get_self_contact_list("https://www.douban.com/contacts/rlist", s)
+        else:
+            return get_self_contact_list("https://www.douban.com/contacts/list", s)
 
     more_than_1page = False
     try:
@@ -158,72 +161,82 @@ def get_other_contact_list(url, s):
     return full_list
 
 
-def dig_user(user_id, s, is_self=False, recursive=False):
-     # 抓取个人基本信息
-    user_info = get_user_info(user_id, s)
-    print(user_info)
-    # 如果title抓出来是豆瓣，说明该用户已经注销
-    if user_info["name"] == "豆瓣":
-        return False
+def dig_user_contact(user_id, s, cat="contact"):
+    assert cat in ["contact", "rcontact"]
 
-    # 抓取图书列表
-    dig_user_book(user_id, s)
+    # if is_self:
+    #     contact_url = "https://www.douban.com/contacts/list"
+    #     rcontact_url = "https://www.douban.com/contacts/rlist"
+    #     contact_list = get_self_contact_list(contact_url, s)
+    #     rcontact_list = get_self_contact_list(rcontact_url, s)
 
-    # 抓取影视列表
-    dig_user_movie(user_id, s)
+    #     save(user_id, contact_list, "contact")
+    #     save(user_id, rcontact_list, "rcontact")
 
-    # 抓取音乐列表
-    dig_user_music(user_id, s)
+    # else:
 
-    # 抓取游戏列表
-    dig_user_game(user_id, s)
-
-    # 抓取舞台剧列表
-    dig_user_drama(user_id, s)
-
-    # Collect Contact/Rev_Contact Info
-    # 自己看自己的关注/被关注列表和自己看别人的关注/被关注列表是不一样的
-    # TODO: is_self 应该需要能够判定而非自己控制
-    if is_self:
-        contact_url = "https://www.douban.com/contacts/list"
-        rcontact_url = "https://www.douban.com/contacts/rlist"
-        contact_list = get_self_contact_list(contact_url, s)
-        rcontact_list = get_self_contact_list(rcontact_url, s)
-
-        save(user_id, contact_list, "contact")
-        save(user_id, rcontact_list, "rcontact")
-
+    homepage_url = f"https://www.douban.com/people/{user_id}/"
+    if cat == "contact":
+        url = homepage_url+"contacts"
     else:
-        homepage_url = f"https://www.douban.com/people/{user_id}/"
-        contact_url = homepage_url+"contacts"
-        rcontact_url = homepage_url+"rev_contacts"
-        contact_list = get_other_contact_list(contact_url, s)
-        rcontact_list = get_other_contact_list(rcontact_url, s)
-        save(user_id, contact_list, "contact")
-        save(user_id, rcontact_list, "rcontact")
+        url = homepage_url+"rev_contacts"
+    full_list = get_other_contact_list(url, s)
+    save(user_id, full_list, cat)
 
-    contact_id_set = set([x["id"] for x in contact_list])
-    rcontact_id_set = set([x["id"] for x in rcontact_list])
+    return full_list
 
-    friend_id_list = list(contact_id_set & rcontact_id_set)
-    friend_id_list.sort()
-    # print(contact_id_set)
-    # print(rcontact_id_set)
-    # print(friend_id_list)
 
-    save(user_id, friend_id_list, "friend")
+def dig_user(user_id, s, recursive=False):
+    try:
+        # 抓取个人基本信息
+        user_info = get_user_info(user_id, s)
+        print(user_info)
+        # 如果title抓出来是豆瓣，说明该用户已经注销
+        if user_info["name"] == "豆瓣":
+            return False
 
-    if recursive:
-        for friend_id in friend_id_list:
-            dig_user(friend_id, s, is_self=False)
+        # 抓取图书列表
+        dig_user_book(user_id, s)
+
+        # 抓取影视列表
+        dig_user_movie(user_id, s)
+
+        # 抓取音乐列表
+        dig_user_music(user_id, s)
+
+        # 抓取游戏列表
+        dig_user_game(user_id, s)
+
+        # 抓取舞台剧列表
+        dig_user_drama(user_id, s)
+
+        # Collect Contact/Rev_Contact Info
+        # 自己看自己的关注/被关注列表和自己看别人的关注/被关注列表是不一样的
+
+        contact_list = dig_user_contact(user_id, s, cat="contact")
+        rcontact_list = dig_user_contact(user_id, s, cat="rcontact")
+
+        contact_id_set = set([x["id"] for x in contact_list])
+        rcontact_id_set = set([x["id"] for x in rcontact_list])
+
+        friend_id_list = list(contact_id_set & rcontact_id_set)
+        friend_id_list.sort()
+
+        save(user_id, friend_id_list, "friend")
+
+        if recursive:
+            for friend_id in friend_id_list:
+                dig_user(friend_id, s)
+    except:
+        print(f"Error when collect {user_id}!")
 
 
 if __name__ == "__main__":
-    with open("./src/yang.json", "r") as f:
+    with open("./src/login.json", "r") as f:
         user_json = json.load(f)
 
-    dig_user(user_id="180945859", s=login(
-        "./src/yang.json"), is_self=False, recursive=False)
+    dig_user(user_id=user_json["user"], s=login(
+        "./src/login.json"), recursive=True)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
     # dig_user(user_id="175563657", s=login(
     #     "./src/yang.json"), is_self=False, recursive=False)

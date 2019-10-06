@@ -88,7 +88,8 @@ def save(user_id, item_list, cat="contact"):
     '''
 
     assert cat in cat_set
-
+    if item_list == []:
+        return
     data_path = os.path.join("data", user_id)
     if not os.path.exists(data_path):
         os.makedirs(data_path)
