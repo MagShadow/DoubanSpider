@@ -164,16 +164,8 @@ def get_other_contact_list(url, s):
 def dig_user_contact(user_id, s, cat="contact"):
     assert cat in ["contact", "rcontact"]
 
-    # if is_self:
-    #     contact_url = "https://www.douban.com/contacts/list"
-    #     rcontact_url = "https://www.douban.com/contacts/rlist"
-    #     contact_list = get_self_contact_list(contact_url, s)
-    #     rcontact_list = get_self_contact_list(rcontact_url, s)
-
-    #     save(user_id, contact_list, "contact")
-    #     save(user_id, rcontact_list, "rcontact")
-
-    # else:
+    if data_exist(user_id, cat=cat):
+        return read(user_id, cat=cat)
 
     homepage_url = f"https://www.douban.com/people/{user_id}/"
     if cat == "contact":
@@ -184,6 +176,17 @@ def dig_user_contact(user_id, s, cat="contact"):
     save(user_id, full_list, cat)
 
     return full_list
+
+    # if is_self:
+    #     contact_url = "https://www.douban.com/contacts/list"
+    #     rcontact_url = "https://www.douban.com/contacts/rlist"
+    #     contact_list = get_self_contact_list(contact_url, s)
+    #     rcontact_list = get_self_contact_list(rcontact_url, s)
+
+    #     save(user_id, contact_list, "contact")
+    #     save(user_id, rcontact_list, "rcontact")
+
+    # else:
 
 
 def dig_user(user_id, s, recursive=False):
@@ -215,7 +218,7 @@ def dig_user(user_id, s, recursive=False):
 
         contact_list = dig_user_contact(user_id, s, cat="contact")
         rcontact_list = dig_user_contact(user_id, s, cat="rcontact")
-
+        # print(contact_list)
         contact_id_set = set([x["id"] for x in contact_list])
         rcontact_id_set = set([x["id"] for x in rcontact_list])
 
@@ -236,7 +239,7 @@ if __name__ == "__main__":
         user_json = json.load(f)
 
     dig_user(user_id=user_json["user"], s=login(
-        "./src/login.json"), recursive=True)
+        "./src/login.json"), recursive=False)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
     # dig_user(user_id="175563657", s=login(
     #     "./src/yang.json"), is_self=False, recursive=False)

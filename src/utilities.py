@@ -111,6 +111,24 @@ def save(user_id, item_list, cat="contact"):
         f_csv.writerows(item_list)
 
 
+def read(user_id, cat="contact"):
+    assert cat in cat_set
+
+    data_path = os.path.join("data", user_id)
+    filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
+    full_list = []
+    if cat != "friend":
+        with open(filename, "r") as f:
+            f_csv = csv.DictReader(f)
+            for row in f_csv:
+                full_list.append(dict(row))
+    else:
+        with open(filename, "r") as f:
+            full_list = f.readlines()
+
+    return full_list
+
+
 if __name__ == "__main__":
     # print(url_to_id("https://www.douban.com/people/ikgendou/"))
     # print(url_to_id("https://www.douban.com/people/2783455"))
