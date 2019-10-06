@@ -62,7 +62,24 @@ def get_rating(span):
 
 
 cat_set = set(["contact", "rcontact", "book",
-               "movie", "music", "game", "drama"])
+               "movie", "music", "game", "drama", "friend"])
+
+
+def data_exist(user_id, cat="contact", renew=1):
+    '''
+    Check filename: "./data/{user_id}/{user_id}_{cat}.csv";
+
+    If the latest modify time is {renew} days advance of now, also need to update.
+    '''
+    assert cat in cat_set
+    data_path = os.path.join("data", user_id)
+    filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
+    if not os.path.isfile(filename):
+        return False
+
+    mtime = os.path.getmtime(filename)
+    ntime = time.time()
+    return (ntime-mtime) < renew*86400
 
 
 def save(user_id, item_list, cat="contact"):
@@ -76,9 +93,14 @@ def save(user_id, item_list, cat="contact"):
     if not os.path.exists(data_path):
         os.makedirs(data_path)
     filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
+    if cat == "friend":
+        with open(filename, "w") as f:
+            for x in item_list:
+                f.write(x + "\n")
+        return
 
     if cat == "contact" or cat == "rcontact":
-        header = ["id", "name", "loc", "sig"]
+        header = ["id", "name"]
     else:
         header = ["id", "rating", "status"]
 
