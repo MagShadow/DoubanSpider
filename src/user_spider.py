@@ -65,6 +65,8 @@ def get_user_info(user_id, s):
 
 
 def get_self_contact_list(url, s):
+    # if data_exist(user_id, cat="contact"):
+    #     return
     temp_url = url
 
     index = 0
@@ -98,6 +100,8 @@ def get_self_contact_list(url, s):
 
 
 def get_other_contact_list(url, s):
+    # if data_exist(user_id, cat="rcontact"):
+    #     return
     temp_url = url
 
     index = 0
@@ -106,6 +110,8 @@ def get_other_contact_list(url, s):
     pause()
     r = s.get(temp_url, headers=headers_ua[0])
     soup_contact = BeautifulSoup(r.text, "lxml")
+    if soup_contact.find("div", {"id": "db-timeline-hd"}) != None:
+        return get_self_contact_list(url, s)
 
     more_than_1page = False
     try:
@@ -161,22 +167,23 @@ def dig_user(user_id, s, is_self=False, recursive=False):
         return False
 
     # 抓取图书列表
-    # dig_user_book(user_id, s)
+    dig_user_book(user_id, s)
 
-    # # 抓取影视列表
-    # dig_user_movie(user_id, s)
+    # 抓取影视列表
+    dig_user_movie(user_id, s)
 
-    # # 抓取音乐列表
-    # dig_user_music(user_id, s)
+    # 抓取音乐列表
+    dig_user_music(user_id, s)
 
-    # # 抓取游戏列表
-    # dig_user_game(user_id, s)
+    # 抓取游戏列表
+    dig_user_game(user_id, s)
 
-    # # 抓取舞台剧列表
-    # dig_user_drama(user_id, s)
+    # 抓取舞台剧列表
+    dig_user_drama(user_id, s)
 
+    # Collect Contact/Rev_Contact Info
     # 自己看自己的关注/被关注列表和自己看别人的关注/被关注列表是不一样的
-
+    # TODO: is_self 应该需要能够判定而非自己控制
     if is_self:
         contact_url = "https://www.douban.com/contacts/list"
         rcontact_url = "https://www.douban.com/contacts/rlist"
@@ -206,17 +213,17 @@ def dig_user(user_id, s, is_self=False, recursive=False):
 
     save(user_id, friend_id_list, "friend")
 
-    if recursive == False:
-        return
-    # Collect Contact/Rev_Contact Info
+    if recursive:
+        for friend_id in friend_id_list:
+            dig_user(friend_id, s, is_self=False)
 
 
 if __name__ == "__main__":
     with open("./src/yang.json", "r") as f:
         user_json = json.load(f)
 
-    dig_user(user_id=user_json["user"], s=login(
-        "./src/yang.json"), is_self=True, recursive=False)
+    dig_user(user_id="180945859", s=login(
+        "./src/yang.json"), is_self=False, recursive=False)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
     # dig_user(user_id="175563657", s=login(
     #     "./src/yang.json"), is_self=False, recursive=False)

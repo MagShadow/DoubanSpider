@@ -69,6 +69,8 @@ def get_movie_list(url, s, get_detail=False):
 
 
 def dig_user_movie(user_id, s, is_self=False):
+    if data_exist(user_id, cat="movie"):
+        return
     do_url = f"https://movie.douban.com/people/{user_id}/do"
     wish_url = f"https://movie.douban.com/people/{user_id}/wish"
     collect_url = f"https://movie.douban.com/people/{user_id}/collect"

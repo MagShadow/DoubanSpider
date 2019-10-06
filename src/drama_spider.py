@@ -69,6 +69,8 @@ def get_drama_list(url, s, get_detail=False):
 
 
 def dig_user_drama(user_id, s, is_self=False):
+    if data_exist(user_id, cat="drama"):
+        return
     wish_url = f"https://www.douban.com/location/people/{user_id}/drama/wish"
     collect_url = f"https://www.douban.com/location/people/{user_id}/drama/collect"
 

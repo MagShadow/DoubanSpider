@@ -71,6 +71,8 @@ def get_music_list(url, s, get_detail=False):
 
 
 def dig_user_music(user_id, s, is_self=False):
+    if data_exist(user_id, cat="music"):
+        return
     do_url = f"https://music.douban.com/people/{user_id}/do"
     wish_url = f"https://music.douban.com/people/{user_id}/wish"
     collect_url = f"https://music.douban.com/people/{user_id}/collect"

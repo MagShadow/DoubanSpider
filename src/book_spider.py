@@ -50,7 +50,7 @@ def get_book_list(url, s, get_detail=False):
             except:
                 rating = 0
             full_list.append((tar_book_id, rating))
-            
+
             if get_detail:
                 get_book_info(tar_book_id, s)
 
@@ -66,6 +66,8 @@ def get_book_list(url, s, get_detail=False):
 
 
 def dig_user_book(user_id, s, is_self=False):
+    if data_exist(user_id, cat="book"):
+        return
     do_url = f"https://book.douban.com/people/{user_id}/do"
     wish_url = f"https://book.douban.com/people/{user_id}/wish"
     collect_url = f"https://book.douban.com/people/{user_id}/collect"

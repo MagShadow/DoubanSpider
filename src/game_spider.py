@@ -66,6 +66,8 @@ def get_game_list(url, s, get_detail=False):
 
 
 def dig_user_game(user_id, s, is_self=False):
+    if data_exist(user_id, cat="game"):
+        return
     do_url = f"https://www.douban.com/people/{user_id}/games?action=do"
     wish_url = f"https://www.douban.com/people/{user_id}/games?action=wish"
     collect_url = f"https://www.douban.com/people/{user_id}/games?action=collect"
