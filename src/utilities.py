@@ -118,14 +118,17 @@ def data_exist(user_id, cat="contact", renew=1):
     If the latest modify time is {renew} days advance of now, also need to update.
     '''
     assert cat in cat_set
-    data_path = os.path.join("data", user_id)
-    filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
-    if not os.path.isfile(filename):
-        return False
+    try:
+        data_path = os.path.join("data", user_id)
+        filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
+        if not os.path.isfile(filename):
+            return False
 
-    mtime = os.path.getmtime(filename)
-    ntime = time.time()
-    return (ntime-mtime) < renew*86400
+        mtime = os.path.getmtime(filename)
+        ntime = time.time()
+        return (ntime-mtime) < renew*86400
+    except:
+        return False
 
 
 def save(user_id, item_list, cat="contact"):
