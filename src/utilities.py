@@ -2,6 +2,7 @@ import re
 import csv
 import os
 import time
+from datetime import datetime
 import numpy as np
 
 from bs4 import BeautifulSoup
@@ -146,6 +147,21 @@ def read(user_id, cat="contact"):
             full_list = f.readlines()
 
     return full_list
+
+
+with open("./src/template.html", "r") as f:
+    template_html = f.read()
+
+
+def generate_html(filename="test.html", title="Douban", content=[]):
+    soup = BeautifulSoup(template_html, "lxml")
+    article = soup.find("div", {"class": "article"})
+    for c in content:
+        article.append(c)
+
+    data_path = os.path.join("data", filename)
+    with open(data_path, "w") as f:
+        f.write(soup.prettify())
 
 
 if __name__ == "__main__":

@@ -31,7 +31,8 @@ def login(filename):
     s.post(login_url, headers=headers_ua[0], data=data)
     # print(html)
     return s
-    
+
+
 def login_2(filename):
     login_url = "https://accounts.douban.com/j/mobile/login/basic"
     with open(filename, "r") as f:
@@ -48,6 +49,7 @@ def login_2(filename):
     s.post(login_url, headers=headers_ua[0], data=data)
     # print(html)
     return s
+
 
 def get_user_info(user_id, s):
     url = f"https://www.douban.com/people/{user_id}/"
@@ -249,9 +251,18 @@ def dig_user(user_id, s, recursive=False):
 if __name__ == "__main__":
     with open("./src/login.json", "r") as f:
         user_json = json.load(f)
+    se = login("./src/login.json")
 
-    dig_user(user_id=user_json["user"], s=login(
-        "./src/login.json"), recursive=True)
+    # dig_user(user_id=user_json["user"], s=login(
+    # "./src/login.json"), recursive=True)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
     # dig_user(user_id="175563657", s=login(
     #     "./src/yang.json"), is_self=False, recursive=False)
+    from status_spider import *
+    # status_list = get_user_status("Ice.Nefar", s=se, time_window=86400*5)
+    # print(status_list)
+    collect_status(user_id=user_json["user"], s=se, time_window=86400 *
+                   5, filename="status.html")
+    # r = se.get("https://www.douban.com")
+    # with open("./test/homepage.html", "w") as f:
+    #     f.write(r.text)
