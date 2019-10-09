@@ -1,7 +1,5 @@
 import urllib
-import requests
 import time
-import sys
 import json
 
 import numpy as np
@@ -15,22 +13,7 @@ from game_spider import dig_user_game
 from drama_spider import dig_user_drama
 
 
-def login(filename):
-    login_url = "https://accounts.douban.com/j/mobile/login/basic"
-    with open(filename, "r") as f:
-        user_json = json.load(f)
-    name, pswd = user_json["email"], user_json["pswd"]
-    data = {
-        'ck': '',
-        "name": name,
-        "password": pswd,
-        'remember': 'true',
-        'ticket': '',
-    }
-    s = requests.Session()
-    s.post(login_url, headers=headers_ua[0], data=data)
-    # print(html)
-    return s
+
 
 
 def login_2(filename):
@@ -249,20 +232,20 @@ def dig_user(user_id, s, recursive=False):
 
 
 if __name__ == "__main__":
-    with open("./src/login.json", "r") as f:
+    with open("./src/config.json", "r") as f:
         user_json = json.load(f)
-    se = login("./src/login.json")
+    se = login("./src/config.json")
 
     # dig_user(user_id=user_json["user"], s=login(
-    # "./src/login.json"), recursive=True)
+    # "./src/config.json"), recursive=True)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))
     # dig_user(user_id="175563657", s=login(
     #     "./src/yang.json"), is_self=False, recursive=False)
-    from status_spider import *
-    # status_list = get_user_status("Ice.Nefar", s=se, time_window=86400*5)
-    # print(status_list)
-    collect_status(user_id=user_json["user"], s=se, time_window=86400 *
-                   5, filename="status.html")
+    # from status_spider import *
+    # # status_list = get_user_status("Ice.Nefar", s=se, time_window=86400*5)
+    # # print(status_list)
+    # collect_status(user_id=user_json["user"], s=se, time_window=86400 *
+    #                5, filename="status.html")
     # r = se.get("https://www.douban.com")
     # with open("./test/homepage.html", "w") as f:
     #     f.write(r.text)

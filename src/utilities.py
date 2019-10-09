@@ -2,6 +2,9 @@ import re
 import csv
 import os
 import time
+import json
+import requests
+
 from datetime import datetime
 import numpy as np
 
@@ -10,6 +13,27 @@ from bs4 import BeautifulSoup
 headers_ua = [
     {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'}]
 headers_l = len(headers_ua)
+
+with open(os.path.join("src", "config.json"), "r") as f:
+    user_json = json.load(f)
+
+
+def login(filename):
+    login_url = "https://accounts.douban.com/j/mobile/login/basic"
+    with open(filename, "r") as f:
+        user_json = json.load(f)
+    name, pswd = user_json["email"], user_json["pswd"]
+    data = {
+        'ck': '',
+        "name": name,
+        "password": pswd,
+        'remember': 'true',
+        'ticket': '',
+    }
+    s = requests.Session()
+    s.post(login_url, headers=headers_ua[0], data=data)
+    # print(html)
+    return s
 
 
 def get_response(s, url):
@@ -31,6 +55,8 @@ def get_response(s, url):
 
 
 def pause(t=1):
+    if user_json["waiting"] != 0:
+        t = user_json["waiting"]
     time.sleep(np.random.rand()*t)
 
 

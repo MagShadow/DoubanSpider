@@ -125,9 +125,9 @@ dmypy.json
 .pyre/
 
 # Personal Data
-login.json
 test.html
 testcode.py
 database_overview.md
 test/
 data/
+src/config.json
