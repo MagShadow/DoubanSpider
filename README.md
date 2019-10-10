@@ -1,12 +1,13 @@
 # DoubanSpider
 v 0.8.1
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE) ![UpdateTime](https://img.shields.io/date/1570697721)
 
 ## Description
 + 基于个人兴趣，试图分析友邻之间的友好关系、兴趣重合程度等，故开发此项目。
 + 主要抓取数据包括用户、关注、图书、影视、音乐、游戏和舞台剧；
 + 评分之间的相似度暂时未完成。
 + 因为豆瓣于19.10.05被粉红击沉，动态功能被关闭。经验证发现书影音、日志、相册等除广播以外的功能都正常，可以发布。于是紧急添加一项抓取动态的功能，帮助大家自行抓取友邻动态生成网页，达到自救效果。
-+ 最后更新时间：2019.10.10
+
 
 ## Requirements
 + Python 3.6+
