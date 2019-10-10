@@ -13,27 +13,6 @@ from game_spider import dig_user_game
 from drama_spider import dig_user_drama
 
 
-
-
-
-def login_2(filename):
-    login_url = "https://accounts.douban.com/j/mobile/login/basic"
-    with open(filename, "r") as f:
-        user_json = json.load(f)
-    name, pswd = user_json["email"], user_json["pswd"]
-    data = {
-        'ck': '',
-        "name": name,
-        "password": pswd,
-        'remember': 'true',
-        'ticket': '',
-    }
-    s = requests.Session()
-    s.post(login_url, headers=headers_ua[0], data=data)
-    # print(html)
-    return s
-
-
 def get_user_info(user_id, s):
     url = f"https://www.douban.com/people/{user_id}/"
 
@@ -188,6 +167,10 @@ def dig_user_contact(user_id, s, cat="contact"):
 def dig_user(user_id, s, recursive=False):
     try:
         # 抓取个人基本信息
+        if is_up_to_date(user_id) and not recursive:
+            print(user_id, "'s data is already up-to-date!")
+            return
+
         user_info = get_user_info(user_id, s)
         print(user_info)
         # 如果title抓出来是豆瓣，说明该用户已经注销
@@ -222,7 +205,7 @@ def dig_user(user_id, s, recursive=False):
         friend_id_list.sort()
 
         save(user_id, friend_id_list, "friend")
-
+        mark_update(user_id)
         if recursive:
             for friend_id in friend_id_list:
                 dig_user(friend_id, s)
@@ -235,7 +218,7 @@ if __name__ == "__main__":
     with open("./src/config.json", "r") as f:
         user_json = json.load(f)
     se = login("./src/config.json")
-
+    dig_user(user_json["user"], se, recursive=False)
     # dig_user(user_id=user_json["user"], s=login(
     # "./src/config.json"), recursive=True)
     # print(get_book_info(book_id="10771256", s=login("./src/yang.json")))

@@ -55,7 +55,7 @@ def get_response(s, url):
 
 
 def pause(t=1):
-    if user_json["waiting"] != 0:
+    if "waiting" in user_json and user_json["waiting"] != 0:
         t = user_json["waiting"]
     time.sleep(np.random.rand()*t)
 
@@ -111,13 +111,16 @@ cat_set = set(["contact", "rcontact", "book",
                "movie", "music", "game", "drama", "friend"])
 
 
-def data_exist(user_id, cat="contact", renew=1):
+def data_exist(user_id, cat="contact", renew=7):
     '''
     Check filename: "./data/{user_id}/{user_id}_{cat}.csv";
 
     If the latest modify time is {renew} days advance of now, also need to update.
     '''
     assert cat in cat_set
+    if "uptime" in user_json:
+        renew = user_json["uptime"]
+
     try:
         data_path = os.path.join("data", user_id)
         filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
@@ -162,20 +165,51 @@ def save(user_id, item_list, cat="contact"):
 
 def read(user_id, cat="contact"):
     assert cat in cat_set
+    try:
+        data_path = os.path.join("data", user_id)
+        filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
+        full_list = []
+        if cat != "friend":
+            with open(filename, "r") as f:
+                f_csv = csv.DictReader(f)
+                for row in f_csv:
+                    full_list.append(dict(row))
+        else:
+            with open(filename, "r") as f:
+                full_list = f.readlines()
 
+        return full_list
+    except:
+        return []
+
+
+def is_up_to_date(user_id, uptime=7):
     data_path = os.path.join("data", user_id)
-    filename = os.path.join(data_path, f"{user_id}_{cat}.csv")
-    full_list = []
-    if cat != "friend":
-        with open(filename, "r") as f:
-            f_csv = csv.DictReader(f)
-            for row in f_csv:
-                full_list.append(dict(row))
-    else:
-        with open(filename, "r") as f:
-            full_list = f.readlines()
+    if not os.path.exists(data_path):
+        return False
+    filename = os.path.join(data_path, f"{user_id}_update_time.txt")
+    if not os.path.isfile(filename):
+        return False
+    with open(filename, "r") as f:
+        timestamp = float(f.read())
+    try:
+        if "uptime" in user_json:
+            uptime = user_json["uptime"]
+        if (time.time()-timestamp) > 86400*uptime:
+            return False
+        else:
+            return True
+    except:
+        return False
 
-    return full_list
+
+def mark_update(user_id):
+    data_path = os.path.join("data", user_id)
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+    filename = os.path.join(data_path, f"{user_id}_update_time.txt")
+    with open(filename, "w") as f:
+        f.write(str(time.time()))
 
 
 with open("./src/template.html", "r") as f:

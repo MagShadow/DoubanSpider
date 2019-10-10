@@ -2,6 +2,7 @@ import sys
 from utilities import *
 from user_spider import dig_user
 from status_spider import collect_status
+from similarity import compare
 
 # import getopt
 
@@ -16,6 +17,7 @@ def main(argv):
 
     -s [user_id] [-t day]
     -i [user_id]
+    -c <user_id_1> <user_id_2> [-f]
     """
     # print(argv)
     l = len(argv)
@@ -75,8 +77,29 @@ def main(argv):
                 exit(2)
 
         if opt == "c":
-            print("Function not complete. Please wait for updates.")
-            return
+            try:
+                assert l >= 3
+                user_id_1, user_id_2 = argv[1], argv[2]
+                result = compare(se, user_id_1, user_id_2)
+                print(f"Compare Result of {user_id_1} and {user_id_2}:")
+                print()
+                print("Number of Common Friends:", len(result["clist_friend"]))
+                print("Number of Common Contacts:",
+                      len(result["clist_contact"]))
+                print("Number of Common Reverse Contacts:",
+                      len(result["clist_rcontact"]))
+                print()
+                print("Number of Common Books:", len(result["clist_book"]))
+                print("Number of Common Movies:", len(result["clist_movie"]))
+                print("Number of Common Music:", len(result["clist_music"]))
+                print("Number of Common Dramas:", len(result["clist_drama"]))
+                print("Number of Common Games:", len(result["clist_game"]))
+                print()
+                print("Similarity of Ratings(percentage): %.1f" % (result["sim"]*100))
+            except Exception as e:
+                print(e)
+                print(main.__doc__)
+                exit(2)
         if opt == "p":
             print("Function not complete. Please wait for updates.")
             return
