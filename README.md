@@ -1,12 +1,13 @@
 # DoubanSpider
-v 0.8.1
-[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE) ![UpdateTime](https://img.shields.io/date/1570697721)
+v 0.8.9
+
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE) ![UpdateTime](https://img.shields.io/date/1570722571)
 
 ## Description
 + 基于个人兴趣，试图分析友邻之间的友好关系、兴趣重合程度等，故开发此项目。
-+ 主要抓取数据包括用户、关注、图书、影视、音乐、游戏和舞台剧；
-+ 评分之间的相似度暂时未完成。
++ 主要抓取数据包括用户、关注、图书、影视、音乐、游戏和舞台剧。
 + 因为豆瓣于19.10.05被粉红击沉，动态功能被关闭。经验证发现书影音、日志、相册等除广播以外的功能都正常，可以发布。于是紧急添加一项抓取动态的功能，帮助大家自行抓取友邻动态生成网页，达到自救效果。
++ 添加比较两用户功能。基于重新定标的余弦相似度计算两位用户共同评分的相似程度。
 
 
 ## Requirements
@@ -48,15 +49,18 @@ pip install lxml
 ```bash
 python ./src/DBspider.py <option> <paras>
 ```
-+ 其中option暂时只实现了三种，分别是：
++ 其中option支持以下几种，分别是：
     + "-h"：查看帮助。
     + "-i"：爬取用户资料。爬取内容包括关注/被关注列表，图书/影视/音乐/游戏/舞台剧的想看/在看/看过记录及评分。在-i后可以接目标用户id，如什么都不接则默认为爬取自己的资料。爬取后资料存储在`data/`文件夹下。
     + "-s"：爬取用户好友动态，模拟崩溃前的豆瓣首页。-s后可接用户id，如不接则默认为爬取自己的时间线。可加-t参数，此后接一个数字表示爬取的天数，默认为1。爬取后在`data/<user_id>/`文件夹下会生成一个html文件，打开即是你应当看到的主页时间线。
+    + "-c"：比较两个用户。需要提供两个用户id，程序会爬取两个用户的评分、关注列表等，计算重定标的余弦相似度并生成报表。
+
 + 例：
 ```bash
 python ./src/DBspider.py -i
 python ./src/DBspider.py -i chuapp
 python ./src/DBspider.py -s -t 5
+python ./src/DBspider.py -c chuapp ahbei
 ```
 
 ## Problems
@@ -66,7 +70,8 @@ python ./src/DBspider.py -s -t 5
     + 如果遇到爬取contact的时候报错，那么很可能是没有成功登录，可以检查一下login中间s.post()的返回值是否正常。
 
 ## Outlooks
-+ 下一步会完成用户相似度比较和用户个人好友报表生成的功能。
++ 下一步会完成用户个人好友报表生成的功能。
++ 细化相似度部分，添加基于欧氏距离的相似度比较。
 
 ## Reference
 + 一个已经存在的同名项目( https://github.com/lanbing510/DouBanSpider )，以作品为出发点，抓取豆瓣上的高分好书。
